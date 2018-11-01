@@ -1,0 +1,17 @@
+../musicbrainzngs/__init__.py
+../musicbrainzngs/caa.py
+../musicbrainzngs/compat.py
+../musicbrainzngs/mbxml.py
+../musicbrainzngs/musicbrainz.py
+../musicbrainzngs/util.py
+../musicbrainzngs/__init__.pyc
+../musicbrainzngs/caa.pyc
+../musicbrainzngs/compat.pyc
+../musicbrainzngs/mbxml.pyc
+../musicbrainzngs/musicbrainz.pyc
+../musicbrainzngs/util.pyc
+.
+dependency_links.txt
+PKG-INFO
+SOURCES.txt
+top_level.txt

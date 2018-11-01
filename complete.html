@@ -1,0 +1,141 @@
+<html>
+  <head>
+      <link rel="stylesheet" href="/assets/leaflet.css">
+      <link rel="stylesheet" href="/assets/L.Control.Sidebar.css">
+      <meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Raleway">
+<style>
+body {font-family: "Raleway", sans-serif}
+
+</style>
+    <!-- Make sure you put this AFTER Leaflet's CSS -->
+    <script src="/assets/leaflet.js"></script>
+    <script src="/assets/L.Control.Sidebar.js"></script>
+    <script src="/assets/spotify-web-api.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+
+    <div id="mapid"></div>
+
+
+    <style>#mapid {height: 80%} </style>
+
+  <title>Spotify Music Mapper</title>
+  </head>
+  <body>
+    <div id="sidebar">
+    </div>
+
+    {% if current_user %}
+      <p>You are logged in as {{ current_user.displayname|escape }}.</p>
+
+
+     <script>
+var mymap = L.map('mapid').setView([0,0], 2);
+     L.tileLayer('https://cartodb-basemaps-{s}.global.ssl.fastly.net/dark_all/{z}/{x}/{y}.png', {
+	attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a> &copy; <a href="http://cartodb.com/attributions">CartoDB</a>',
+	subdomains: 'abcd',
+	maxZoom: 19
+}).addTo(mymap);
+
+var sidebar = L.control.sidebar('sidebar', {
+            closeButton: true,
+            position: 'left'
+        });
+
+// to create playlists
+//function createPlaylist(sp, me){
+//    
+//}
+//var sp = new SpotifyWebApi();
+//sp.setAccessToken("{{current_user.access_token}}");
+//var me = sp.getMe().then(function(Object){ console.log(Object["id"])});
+//var playlistName = "something to be user inputted";
+//var newPlaylist = sp.createPlaylist(me, {name : playlistName});
+//newPlaylist.then(function(Object){ console.log(Object)});
+mymap.addControl(sidebar);
+var placesPeople = new Map();
+var placesSongIDs = new Map();
+var newPlaylist = [];
+         
+         
+function addToNew(place){
+//    console.log(place);
+//    newPlaylist.set(place, "spotify:track:" + placesSongIDs.get(place));
+    console.log(placesSongIDs.get(place));
+    newPlaylist = newPlaylist.concat(Array.from(placesSongIDs.get(place)));
+    console.log(newPlaylist.length);
+    console.log(newPlaylist);
+//    console.log(placesSongIDs.get(place))
+//    console.log(newPlaylist.keys());
+    var list = document.createElement("LI");
+    var text = document.createTextNode(place);
+    list.appendChild(text);
+    document.getElementById("playlistPlaces").appendChild(list);
+}
+         
+         
+function createNewPlaylist(playlistName){
+    console.log(playlistName);
+    if(newPlaylist.length > 0){
+        var sp = new SpotifyWebApi();
+        sp.setAccessToken("{{current_user.access_token}}");
+        sp.getMe().then(function(data) {
+            //console.log("me", data["id"]);
+            sp.createPlaylist(data["id"], {name : playlistName}).then(function(moreData, userid = data["id"]) {
+                //console.log("playlist id", moreData["id"]);
+                sp.addTracksToPlaylist(userid, moreData["id"], newPlaylist)
+            });
+      });
+    }
+}
+         
+function clearNewPlaylist(){
+    newPlaylist = [];
+    var oldList = document.getElementById("playlistPlaces");
+    oldList.innerHTML = ""; // FIX SOMEHOW
+}
+      </script>
+{% for place, coordinates in coords.items()%}
+    <script>
+    var placeMark = L.marker({{coordinates}}).addTo(mymap);
+    var ids = new Set(); //maybe use a set to avoid repetition
+    var person = "";
+    {% for person in locations[place] %}
+        person += "<h4>{{person}} </h4>";
+        {% for tracks in artists[person] %}
+            if(person.includes("{{tracks.name}}") == false){ //prevents doubles
+                person += "&nbsp;&nbsp;&nbsp;&nbsp;{{tracks.name}}<br>";
+                ids.add("spotify:track:{{tracks.id}}");
+            }
+        {% endfor %}
+    {% endfor %}
+    placesPeople.set("{{place}}", person);
+    placesSongIDs.set("{{place}}", ids);
+placeMark.openPopup()
+.on('click', function(){
+  sidebar.setContent("<h2>{{place}}</h2>" + placesPeople.get("{{place}}") + "<br><button onclick = \"addToNew('{{place}}')\"> Click to add to new playlist</button>");
+  sidebar.toggle();
+});
+      </script>
+
+{% endfor %}
+      
+      <p> Music from these cities will be added to your new playlist:</p>
+      <p id = "playlistPlaces"></p>
+      
+<form>
+  <div>
+    <label>Choose a name for your new playlist</label>
+    <input type="text" id="newPlaylist">
+    <input type = "button" onclick = "$('form').submit(createNewPlaylist($('input:first').val()))" value = "Create a new playlist">
+  </div>
+</form>
+      <button onclick = "clearNewPlaylist()"> Reset new playlist items</button>
+      <p><a href="/auth/logout">Log out</a></p>
+    {% else %}
+      <p>You are not yet logged into this site</p>
+      <p><a href="/auth/login">Log in to Spotify</a></p>
+    {% endif %}
+  </body>
+</html>

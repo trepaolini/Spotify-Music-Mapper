@@ -1,0 +1,18 @@
+Metadata-Version: 1.1
+Name: musicbrainzngs
+Version: 0.6
+Summary: Python bindings for the MusicBrainz NGS and the Cover Art Archive webservices
+Home-page: https://python-musicbrainzngs.readthedocs.org/
+Author: Alastair Porter
+Author-email: alastair@porter.net.nz
+License: BSD 2-clause
+Description: UNKNOWN
+Platform: UNKNOWN
+Classifier: Development Status :: 5 - Production/Stable
+Classifier: License :: OSI Approved :: BSD License
+Classifier: License :: OSI Approved :: ISC License (ISCL)
+Classifier: Intended Audience :: Developers
+Classifier: Operating System :: OS Independent
+Classifier: Programming Language :: Python
+Classifier: Topic :: Database :: Front-Ends
+Classifier: Topic :: Software Development :: Libraries :: Python Modules

@@ -1,0 +1,22 @@
+runtime: python27
+api_version: 1
+threadsafe: no
+
+handlers:
+- url: /
+  static_files: start.html
+  upload: start.html
+
+- url: /assets
+  static_dir: assets
+
+- url: /.*
+  script: main.application
+
+libraries:
+- name: webapp2
+  version: latest
+- name: jinja2
+  version: latest
+- name: ssl
+  version: latest
